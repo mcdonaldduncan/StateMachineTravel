@@ -20,6 +20,9 @@ public class JetController : MonoBehaviour
     Vector3 startPoint;
     Vector3 current;
 
+    Transform afterBurner1;
+    Transform afterBurner2;
+
     Person person = new Person();
     Jet jet = new Jet();
     Rigidbody rb;
@@ -28,6 +31,10 @@ public class JetController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        afterBurner1 = gameObject.transform.GetChild(1).GetChild(0);
+        afterBurner2 = gameObject.transform.GetChild(1).GetChild(1);
+        afterBurner1.gameObject.SetActive(false);
+        afterBurner2.gameObject.SetActive(false);
         startPoint = transform.position;
         rb.velocity = Vector3.zero;
     }
@@ -38,12 +45,10 @@ public class JetController : MonoBehaviour
         if (GameManager.Instance.currentState == TripState.STATIC)
         {
             GameManager.Instance.acceptingNewTargets = true;
-            
             return;
         }
             
         TravelSwitch();
-
     }
 
     void TravelSwitch()
@@ -60,7 +65,6 @@ public class JetController : MonoBehaviour
                     GameManager.Instance.currentState = TripState.CANCELLED;
                     Debug.Log("You have too much luggage!");
                 }
-                
                 break;
             case TripState.BOARDING:
                 if (jet.PrepareForTravel())
@@ -80,6 +84,10 @@ public class JetController : MonoBehaviour
             case TripState.TRAVELING:
                 if (jet.Travel())
                 {
+                    afterBurner1.gameObject.SetActive(true);
+                    afterBurner2.gameObject.SetActive(true);
+                    //if (transform.position.y < 2)
+                    //    transform.position = new Vector3(transform.position.x, 2, transform.position.z);
                     rb.isKinematic = true;
                     rb.useGravity = false;
                     ApplySteering();
@@ -87,6 +95,8 @@ public class JetController : MonoBehaviour
                 }
                 else
                 {
+                    afterBurner1.gameObject.SetActive(false);
+                    afterBurner2.gameObject.SetActive(false);
                     Debug.Log("Engine Failure");
                     GameManager.Instance.currentState = TripState.ENGINE_FAILURE;
                     rb.isKinematic = false;
@@ -115,7 +125,6 @@ public class JetController : MonoBehaviour
                     GameManager.Instance.currentState = TripState.TRAVELING;
                     Debug.Log("Engine recovery succesful!");
                 }
-                
                 break;
             default:
                 break;
@@ -135,8 +144,6 @@ public class JetController : MonoBehaviour
 
     void ApplySteering()
     {
-        Vector3 targetDiretion = transform.position + velocity;
-        // or + velocity
         Quaternion rotation = Quaternion.LookRotation(velocity);
 
         float distanceToFinal = Vector3.Distance(transform.position, GameManager.Instance.target.position);
@@ -181,6 +188,8 @@ public class JetController : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Ground"))
         {
+            if (GameManager.Instance.currentState != TripState.ENGINE_FAILURE)
+                return;
             Debug.Log("You crashed!");
             rb.isKinematic = true;
             rb.useGravity = false;

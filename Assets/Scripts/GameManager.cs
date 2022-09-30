@@ -29,7 +29,6 @@ public class GameManager : Singleton<GameManager>
         }
 
         Debug.Log("Not accepting targets at this time!");
-        
     }
 }
 

@@ -115,7 +115,6 @@ public class CameraController : MonoBehaviour
         return movementVec;
     }
 
-
     void ContinuousRotation()
     {
         if (Input.GetMouseButtonDown(1))
@@ -142,7 +141,6 @@ public class CameraController : MonoBehaviour
         }
         
     }
-
     void MouseOrbit()
     {
         if (Input.GetMouseButtonDown(2))
@@ -162,7 +160,6 @@ public class CameraController : MonoBehaviour
 
         Vector3 adjustedOrbit = new Vector3(orbitPoint.x, transform.position.y, orbitPoint.z);
         
-
         if (isContinuous)
         {
             if (Input.GetAxis("Mouse X") > 0)
